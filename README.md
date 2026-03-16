@@ -1,6 +1,8 @@
 # 🚖 Chicago Taxi "Deadhead" Analytics
 **Optimizing Driver Efficiency using BigQuery & SQL Window Functions**
 
+![Here's the image](https://github.com/maanaskauntia/Taxis-Service-Deadhead-Analysis/blob/main/The%20Enterprise%20Benefit%20Gap.jpeg.png?raw=true)
+
 ## 📌 Project Overview
 This project analyzes **210 Million+ rows** of Chicago taxi data to identify "Deadhead Traps"—geographic areas and time windows where drivers experience the longest idle times between fares. 
 
