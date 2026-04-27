@@ -19,7 +19,7 @@ WITH data_prep AS
   FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
   WHERE trip_seconds > 60   --- Making sure only trips lasting more than a minute are considered
     AND trip_miles > 0.1  --- Making sure only trips greater than 1/10th of a mile are considered
-    AND fare > 0 --- Making sure the trip had non-negative fare to remove erroneous/anomalous data         
+    AND fare > 0 --- Making sure the trip had non-negative fare to remove misreported trips        
  ),
 
  Deadhead_calc AS
@@ -27,24 +27,24 @@ WITH data_prep AS
   SELECT *, TIMESTAMP_DIFF(next_trip_start, trip_end_timestamp, MINUTE) AS deadhead_minutes
   --- Calculating time-difference in end of one trip and start of the next trip as 'deadhead_minutes'
   --- This is the time that a driver spent waiting for the next ride
- 
+
   FROM data_prep
  )
  
 SELECT 
     dropoff_community_area, 
     time_window, 
-    ROUND(AVG(deadhead_minutes), 2) AS avg_wait_mins, 
+    ROUND(AVG(deadhead_minutes), 2) AS avg_wait_mins,
     --- Aggregating dead_minutes by average for each dropoff_community_area/time_window pair
- 
-    COUNT(*) AS trips_considered --- Displaying the sample size of trips considered for the deadhead time avg
- 
+
+    COUNT(*) AS trips_considered
+
 FROM Deadhead_calc
 WHERE deadhead_minutes > 0 --- Filtering negative wait-times
   AND deadhead_minutes < 90 
   --- Filtering out wait times greater than 90 mins, considering them as lunch-breaks/shift-ends
-  
- AND dropoff_community_area IS NOT NULL -- Cleaning up the null locations
+
+  AND dropoff_community_area IS NOT NULL -- Cleaning up the null locations
 GROUP BY 1, 2 --- Making dropoff_community_area/time_window pairs that other metrics are grouped by
-HAVING trips_considered > 50 -- Filtering out one-off long wait time incidents
-ORDER BY avg_wait_mins DESC --- Displaying the longest wait time locations+time_window combinations first
+HAVING trips_considered > 3650 -- focusing on location/time pairs averaging at least one trip/day for the 10yr duration
+ORDER BY avg_wait_mins DESC --- Displaying the locations+time pairs with the highest avg deadhead time first
