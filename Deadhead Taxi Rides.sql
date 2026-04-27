@@ -19,10 +19,7 @@ WITH data_prep AS
   FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
   WHERE trip_seconds > 60   --- Making sure only trips lasting more than a minute are considered
     AND trip_miles > 0.1  --- Making sure only trips greater than 1/10th of a mile are considered
-    AND fare > 0 --- Making sure the trip had non-negative fare to remove erroneous/anomalous data
-    AND trip_start_timestamp >= '2021-01-01' 
-    AND trip_start_timestamp < '2021-02-01' 
-    --- Looking at only the month of Jan            
+    AND fare > 0 --- Making sure the trip had non-negative fare to remove erroneous/anomalous data         
  ),
 
  Deadhead_calc AS
