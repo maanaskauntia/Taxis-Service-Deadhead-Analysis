@@ -47,12 +47,20 @@ That was the cleaning process. The final analysis thus presents insights based o
 
 ## Key Findings and Recommendations:
 
+The results csv file can be found [here](https://drive.google.com/file/d/1TI7968qD6lBhajAZmwleC3oyaLMh3Dle/view?usp=sharing).
+
 1) Dropoff community area 76 consistently ranks high for deadhead time across multiple time windows throughout the day. The business impact is significant (500+ hours spent waiting for bookings every single day). Similarly, community area 56 is a deadhead trap from 6 am to 10 am, and so is community area 12, from 4 pm to 6 pm.
 
+<div align="center">
+  <img src="https://drive.google.com/thumbnail?id=1YTcUF095uNGij18QTyUNNBJt2k-K5XFz&sz=w800" width="700" alt="Chicago Taxi Analysis">
+</div>
 
 > <u>Recommendation</u>: The price for the trips to these 3 locations (76, 56, and 12) at the time windows mentioned above should be increased in order to compensate for the time lost waiting for the next pickup.
 
 2) Dropoff community areas 32, 28, 24, 7 and 8 have the least wait times of any location late night (2 am to 4 am).
 
+<div align="center">
+  <img src="https://drive.google.com/thumbnail?id=1gdZwCa0QIlQRkAKlKTAyvEhDDFwXesC9&sz=w800" width="700" alt="Chicago Taxi Deadhead Analysis Map">
+</div>
 
 > <u>Recommendation</u>: The price for trips to these 5 locations (32, 28, 24, 7, 8) should be lowered especially at 2 am in the morning to beat price offerings from other companies. We can earn more even by lowering our prices if we win every bid (involving other companies) by completing a higher number of trips to all these locations at between 2 and 4 am.
