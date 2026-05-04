@@ -1,27 +1,47 @@
-# 🚖 Chicago Taxi "Deadhead" Analytics
-**Optimizing Driver Efficiency using BigQuery & SQL Window Functions**
+## Project Overview:
 
-## 📌 Project Overview
-This project analyzes **210 Million+ rows** of Chicago taxi data to identify "Deadhead Traps"—geographic areas and time windows where drivers experience the longest idle times between fares. 
+In 2023, the City of Chicago (in its role as a regulatory agency) released the [Chicago Taxi Trips (2013-2023)](https://data.cityofchicago.org/Transportation/Taxi-Trips-2013-2023-/wrvz-psew/about_data) dataset. The dataset contained 210M+ rows of data on individual taxi trips recorded over a decade.
 
-## 🛠 The Data Funnel (Audit Results)
-Before analysis, I performed a rigorous data audit to ensure metric integrity:
-* **Initial Dataset:** 210.8 Million rows.
-* **Filter 1 (Technical Errors):** Removed 10.7M rows with 0-second durations.
-* **Filter 2 (Ghost Trips):** Identified and removed 53.5k trips with >10 miles but 0 seconds.
-* **Filter 3 (Stationary):** Removed 30M rows with 0 miles (idle/parked).
-* **Final Analysis Set:** Focused on high-integrity trips from 2021–Present.
+Here's the business question that this project attempts to answer:
 
-## 🧠 Logical Architecture
-To calculate the "Deadhead" (unpaid idle time), I utilized the following SQL logic:
-1. **Window Function:** Used `LEAD()` partitioned by `taxi_id` to find the gap between Trip A's end and Trip B's start.
-2. **Time Bucketing:** Categorized trips into **2-hour blocks** to identify supply/demand shifts throughout the day.
-3. **Behavioral Threshold:** Implemented a **90-minute cap**. Anything longer is categorized as a "Driver Break" rather than "Market Wait Time."
+_Which drop off locations have the highest 'deadhead times' (i.e. the idle time spent by drivers finding their next ride), and at what hours in the day?_
 
-## 🚀 Strategic Recommendations (Hypothesized)
-Based on preliminary data trends:
-* **O'Hare (Area 76):** High volume but high deadhead. **Action:** Implement "Queue-Jump" incentives for drivers to move to nearby high-demand zones.
-* **Residential Areas:** Late-night drop-offs create "One-way traps." **Action:** Suggest deadheading back to the Loop during the 22:00-00:00 window.
+For instance, if the dataset had Delhi data, the query could reveal that Jahangirpuri (North West Delhi) has the highest deadhead time between 8 p.m. and 10 p.m., meaning that its the dropoff location after which drivers have to struggle the most to find the next pickup, especially in the night.
 
----
-*Note: This project was built using Google BigQuery. Due to the massive scale of the public dataset (1TB+ scan volume), query optimization and partitioning were prioritized to manage compute resources.*
+There could be many use-cases for such information. One primary use case for a profit-making enterprise (Uber, Ola, Rapido and such) could be to build benefits and costs into their pricing model based on deadhead times of specific locations. Basically, they could **charge higher rates for rides to areas with significantly higher deadhead times** and lower rates for areas where finding pickups is much quicker and easier. This would benefit both the driver and the company (trying to make the best economic use of each driver's 8-10 hour shifts).
+
+## Cleaning the Data for Accuracy:
+
+As a quick reference, the SQL query utilized for the analysis can be found [here](https://github.com/maanaskauntia/Taxis-Service-Deadhead-Analysis/blob/main/Deadhead%20Taxi%20Rides.sql).
+
+The dataset originally had 23 columns and 210M+ rows. However, significant amounts of filtering was required to reach reliable insights. Here are the details of the cleaning process:
+
+&#8211; Filtered out trips that were less than a minute long (17M rows)
+
+&#8211; Further filtered out trips covering less than 0.1 miles in distance (another 33M rows)
+
+&#8211; Further filtered out trips with negative fare value (another 41,000 rows)
+
+From here, we were left with ~160M entries. Deadhead minutes were calculated for each of these entries. However, another round of filtering was required to get accurate results:
+
+&#8211; Filtered out trips with negative deadhead time (41M rows). These were rows which showed that the next trip started before the previous trip had ended, which indicates misreporting
+
+&#8211; Further filtered out trips with greater than 90 mins deadhead time (30M rows). The logic here is that a wait time of >90 mins indicates either a meal break or a shift change. If we had let this data into our analysis, it would have falsely skewed the numbers towards the higher end
+
+&#8211; Further filtered out trips where the dropoff location is NULL (9M rows)
+
+&#8211; Finally, after the aggregations were complete, we only considered average deadhead times that were based on at least 3650 trips, to focus only on 'locations+time slot' pairs that had a significant business impact. Across 10 years, if there were locations where we did not even do one trip a day, the business impact of those might not be nearly as much as of the ones where we are waiting too much, multiple times a day
+
+That was the cleaning process. The final analysis thus presents insights based on data for ~80M rows, spanning 10 years (2013-2023). The resulting .csv has only 550 rows, which represent the most significant deadhead location-time pairs.
+
+## Key Findings and Recommendations:
+
+1) Dropoff community area 76 consistently ranks high for deadhead time across multiple time windows throughout the day. The business impact is significant (500+ hours spent waiting for bookings every single day). Similarly, community area 56 is a deadhead trap from 6 am to 10 am, and so is community area 12, from 4 pm to 6 pm.
+
+
+Recommendation: The price for the trips to these 3 locations (76, 56, and 12) at the time windows mentioned above should be increased in order to compensate for the time lost waiting for the next pickup.
+
+2) Dropoff community areas 32, 28, 24, 7 and 8 have the least wait times of any location late night (2 am to 4 am).
+
+
+Recommendation: The price for trips to these 5 locations (32, 28, 24, 7, 8) should be lowered especially at 2 am in the morning to beat price offerings from other companies. We can earn more even by lowering our prices if we win every bid (involving other companies) by completing a higher number of trips to all these locations at between 2 and 4 am.
