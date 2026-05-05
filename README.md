@@ -43,7 +43,7 @@ From here, we were left with ~160M entries. Deadhead minutes were calculated for
 </dd>
 </dl>
 
-That was the cleaning process. The final analysis thus presents insights based on data for ~80M rows, spanning 10 years (2013-2023). The resulting .csv has only 550 rows, which represent the most significant deadhead location-time pairs.
+That was the cleaning process. The final analysis thus presents insights based on data for ~80M rows, spanning 10 years (2013-2023). The resulting .csv has only 485 rows, which represent the most significant deadhead location-time pairs.
 
 ## Key Findings and Recommendations:
 
